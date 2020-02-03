@@ -8,6 +8,7 @@ It is designed to be easily debugged at the cost of performance.
 
 ### Execution
 A state machine steps through each instruction.
+
 Fetch	- Read the address in the program counter register. Wait for the instruction.
 Decode 	- Convert the 32 bit instruction into an easily readable format.
 Execute - Preform the decoded operation. Update ALU output. Update register write enable.
@@ -16,8 +17,10 @@ Store 	- Write the calculated memory address with the data in rs2.
 
 ### Instructions Per Second
 I already mentioned that it is slow. Lets examine why.
+
 Memory access - 4 cycles. Core -> Memory_controller -> Device -> Memory_controller -> Core
 State machine - Each state takes a cycle
+
 Example 1: BEQ, This takes 5 + 1 + 1 cycles because Fetch(5), Decode(1), Execute(1)
 Example 2: LBU, This takes 5 + 1 + 1 + 4 cycles because Fetch(5), Decode(1), Execute(1), Load(4)
 
