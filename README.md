@@ -49,16 +49,18 @@ Clone the GNU toolchain and build the Newlib cross-compiler.
     sudo make -j8
 
 ### Compile C
-I'll update this section later
+
+    ./compile.sh program.c
 
 ### Analyze HDL
-I'll update this section later
 
-### Simulate with compiled instructions
-I'll update this section later
+    ./sim.sh 100us
+    gtkwave tb.ghw
+
+### Go all in
+
+    ./all.sh program.c 100us
 
 ### Program an FPGA
-I'll update this section later
-
-### Debug
-I'll update this section later
+For Xilinx, The instruction RAM should be infered as BRAM. 
+Don't forget to include your IO constraints.
