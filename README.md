@@ -81,5 +81,8 @@ Open soc.vhd. Find the memory_controller instantiation. Modify the next availabl
 For Xilinx, The instruction RAM should be infered as BRAM.
 Don't forget to include your IO constraints.
 
+### Current Status
+I'm fairly confident that it works. Let me know if you find bugs.
+
 ### You've read this far
-It is a work in progress. Please don't expect it to "just work". As of 02/04/2020 i'm still working on it.
+I'll probably make a faster core or expand the instruction set to RV32IM in the future.
