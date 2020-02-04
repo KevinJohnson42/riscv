@@ -64,3 +64,6 @@ Clone the GNU toolchain and build the Newlib cross-compiler.
 ### Program an FPGA
 For Xilinx, The instruction RAM should be infered as BRAM. 
 Don't forget to include your IO constraints.
+
+### You've read this far
+It is a work in progress. Please don't expect it to "just work".
