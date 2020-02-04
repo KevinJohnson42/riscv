@@ -61,6 +61,9 @@ Clone the GNU toolchain and build the Newlib cross-compiler.
 
     ./all.sh program.c 100us
 
+### Create memory mapped devices
+Open soc.vhd. Find the memory_controller instantiation. Modify the next available address range. Connect your device to the controller.
+
 ### Program an FPGA
 For Xilinx, The instruction RAM should be infered as BRAM. 
 Don't forget to include your IO constraints.
