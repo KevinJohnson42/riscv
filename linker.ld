@@ -2,7 +2,7 @@ _start = 0x0000;
 
 MEMORY
 {
-    ram : ORIGIN = 0, LENGTH = 0X10000
+    ram : ORIGIN = 0, LENGTH = 0X1000
 }
 
 SECTIONS
