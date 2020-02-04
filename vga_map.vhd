@@ -155,6 +155,7 @@ begin
                 pixel_red   <= (others => '0');
                 pixel_green <= (others => '0');
                 pixel_blue  <= (others => '0');
+            --BELOW: uncomment to check edge pixels
             --elsif (unsigned(h_count) = 0) then
             --    pixel_red     <= (others => '1');
             --    pixel_green   <= (others => '0');

@@ -340,7 +340,7 @@ begin
 	j_imm(31 downto 20) <= (others => '1') when (inst(31) = '1') else (others => '0');
 	j_imm(19 downto 0)  <= inst(19 downto 12) & inst(20) & inst(30 downto 21) & "0";
 
-	--Decode instruction
+	--Decode instruction (Chapter 24)
 	inst_decoded_ps : process(clock_i)
 	begin
 		if rising_edge(clock_i) then
