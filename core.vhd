@@ -213,7 +213,7 @@ begin
 			if (reset_i = '1') then
 				mem_mask <= (others => '0');
 			elsif (state = fetch) then
-				mem_mask <= "1111";
+				mem_mask <= "----"; --Don't care on reads
 			elsif (state = execute) then
 				case inst_decoded is
 					when sb_32i => mem_mask <= "0001";
