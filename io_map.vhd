@@ -23,8 +23,8 @@ end entity;
 
 architecture rtl of io_map is
 
-    signal read_valid  : std_logic        := '0';
-    signal write_valid : std_logic        := '0';
+    signal read_valid  : std_logic                     := '0';
+    signal write_valid : std_logic                     := '0';
     signal io_dout     : std_logic_vector(31 downto 0) := (others => '0');
 
 begin

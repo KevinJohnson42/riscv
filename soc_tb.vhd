@@ -7,17 +7,17 @@ end entity soc_tb;
 
 architecture testbench of soc_tb is
 
-    signal clock_i   : std_logic := '0';
-    signal reset_i   : std_logic := '0';
-    signal uart_rx_i : std_logic := '1';
-    signal uart_tx_o : std_logic := '0';
+    signal clock_i   : std_logic                     := '0';
+    signal reset_i   : std_logic                     := '0';
+    signal uart_rx_i : std_logic                     := '1';
+    signal uart_tx_o : std_logic                     := '0';
     signal gpio_i    : std_logic_vector(31 downto 0) := (others => '0');
     signal gpio_o    : std_logic_vector(31 downto 0) := (others => '0');
-    signal vga_r_o   : std_logic_vector(4 downto 0) := (others => '0');
-    signal vga_g_o   : std_logic_vector(5 downto 0) := (others => '0');
-    signal vga_b_o   : std_logic_vector(4 downto 0) := (others => '0');
-    signal vga_hs_o  : std_logic := '0';
-    signal vga_vs_o  : std_logic := '0';
+    signal vga_r_o   : std_logic_vector(4 downto 0)  := (others => '0');
+    signal vga_g_o   : std_logic_vector(5 downto 0)  := (others => '0');
+    signal vga_b_o   : std_logic_vector(4 downto 0)  := (others => '0');
+    signal vga_hs_o  : std_logic                     := '0';
+    signal vga_vs_o  : std_logic                     := '0';
 
 begin
     clock_i_ps : process
@@ -60,7 +60,7 @@ begin
         );
 
     --LOOP back
-    gpio_i <= gpio_o;
+    gpio_i    <= gpio_o;
     uart_rx_i <= uart_tx_o;
 
 end architecture testbench;

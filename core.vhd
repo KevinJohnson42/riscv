@@ -22,8 +22,8 @@ end entity;
 
 architecture rtl of core is
 
-	--Constants
-	constant xlen_c : natural := 32; --(Section 2.1)
+	--Constants (Section 2.1)
+	constant xlen_c : natural := 32;
 
 	--Define the internal registers (Section 2.1)
 	type register_array is array (xlen_c-1 downto 0) of unsigned(xlen_c-1 downto 0);
@@ -130,8 +130,7 @@ begin
 						if (unsigned(mem_addr_i) = mem_addr_load) and (mem_read_valid_i = '1') and (mem_read_active = '1') then
 							state <= fetch;
 						end if;
-					when store =>
-						--We could wait for a 'valid write', but this is faster
+					when store => --We could wait for a 'valid write', but this is faster
 						state <= fetch;
 					when others => null; --Never
 				end case;
@@ -541,7 +540,5 @@ begin
 			end if;
 		end if;
 	end process;
-
-
 
 end architecture rtl;

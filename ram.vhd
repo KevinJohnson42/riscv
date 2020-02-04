@@ -6,11 +6,11 @@ use work.inst_pack.all;
 entity ram is
     generic
     (
-        ram_depth_g     : natural       := 10;
-        ram_byte_0_g    : data_array    := (others => (others => '0'));
-        ram_byte_1_g    : data_array    := (others => (others => '0'));
-        ram_byte_2_g    : data_array    := (others => (others => '0'));
-        ram_byte_3_g    : data_array    := (others => (others => '0'))
+        ram_depth_g  : natural    := 10;
+        ram_byte_0_g : data_array := (others => (others => '0'));
+        ram_byte_1_g : data_array := (others => (others => '0'));
+        ram_byte_2_g : data_array := (others => (others => '0'));
+        ram_byte_3_g : data_array := (others => (others => '0'))
     );
     port
     (
@@ -41,7 +41,7 @@ architecture rtl of ram is
     signal valid       : std_logic                     := '0';
     signal dout        : std_logic_vector(31 downto 0) := (others => '0');
 
-    signal address     : unsigned(depth_c-1 downto 0)   := (others => '0');
+    signal address : unsigned(depth_c-1 downto 0) := (others => '0');
 
 begin
 

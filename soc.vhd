@@ -6,11 +6,11 @@ use work.inst_pack.all;
 entity soc is
     generic
     (
-        uart_cycles_g   : positive := 10;
-        gen_timer_g     : natural range 0 to 1 := 0;
-        gen_uart_g      : natural range 0 to 1 := 0;
-        gen_gpio_g      : natural range 0 to 1 := 0;
-        gen_vga_g       : natural range 0 to 1 := 0
+        uart_cycles_g : positive             := 10;
+        gen_timer_g   : natural range 0 to 1 := 0;
+        gen_uart_g    : natural range 0 to 1 := 0;
+        gen_gpio_g    : natural range 0 to 1 := 0;
+        gen_vga_g     : natural range 0 to 1 := 0
     );
     port
     (
@@ -336,66 +336,66 @@ begin
         );
 
     --TIMER
-    gen_timer: if (gen_uart_g = 1) generate
-    timer_map_1 : entity work.timer_map
-        port map (
-            clock_i       => clock_i,
-            reset_i       => reset_i,
-            read_i        => timer_read_i,
-            write_i       => timer_write_i,
-            mask_i        => timer_mask_i,
-            addr_i        => timer_addr_i,
-            data_i        => timer_data_i,
-            read_valid_o  => timer_read_valid_o,
-            write_valid_o => timer_write_valid_o,
-            data_o        => timer_data_o
-        );
+    gen_timer : if (gen_uart_g = 1) generate
+        timer_map_1 : entity work.timer_map
+            port map (
+                clock_i       => clock_i,
+                reset_i       => reset_i,
+                read_i        => timer_read_i,
+                write_i       => timer_write_i,
+                mask_i        => timer_mask_i,
+                addr_i        => timer_addr_i,
+                data_i        => timer_data_i,
+                read_valid_o  => timer_read_valid_o,
+                write_valid_o => timer_write_valid_o,
+                data_o        => timer_data_o
+            );
     end generate;
 
     --UART
-    gen_uart: if (gen_uart_g = 1) generate
-    uart_map_1 : entity work.uart_map
-        generic map (
-            cycles_g => uart_cycles_g,
-            depth_g  => 12
-        )
-        port map (
-            clock_i       => clock_i,
-            reset_i       => reset_i,
-            read_i        => uart_read_i,
-            write_i       => uart_write_i,
-            mask_i        => uart_mask_i,
-            addr_i        => uart_addr_i,
-            data_i        => uart_data_i,
-            read_valid_o  => uart_read_valid_o,
-            write_valid_o => uart_write_valid_o,
-            data_o        => uart_data_o,
-            rx_i          => uart_rx_i,
-            tx_o          => uart_tx_o
-        );
+    gen_uart : if (gen_uart_g = 1) generate
+        uart_map_1 : entity work.uart_map
+            generic map (
+                cycles_g => uart_cycles_g,
+                depth_g  => 12
+            )
+            port map (
+                clock_i       => clock_i,
+                reset_i       => reset_i,
+                read_i        => uart_read_i,
+                write_i       => uart_write_i,
+                mask_i        => uart_mask_i,
+                addr_i        => uart_addr_i,
+                data_i        => uart_data_i,
+                read_valid_o  => uart_read_valid_o,
+                write_valid_o => uart_write_valid_o,
+                data_o        => uart_data_o,
+                rx_i          => uart_rx_i,
+                tx_o          => uart_tx_o
+            );
     end generate;
 
     --GPIO
-    gen_gpio: if (gen_gpio_g = 1) generate
-    io_map_1 : entity work.io_map
-        port map (
-            clock_i       => clock_i,
-            reset_i       => reset_i,
-            read_i        => io_read_i,
-            write_i       => io_write_i,
-            mask_i        => io_mask_i,
-            addr_i        => io_addr_i,
-            data_i        => io_data_i,
-            read_valid_o  => io_read_valid_o,
-            write_valid_o => io_write_valid_o,
-            data_o        => io_data_o,
-            gpio_data_i   => io_gpio_data_i,
-            gpio_data_o   => io_gpio_data_o
-        );
+    gen_gpio : if (gen_gpio_g = 1) generate
+        io_map_1 : entity work.io_map
+            port map (
+                clock_i       => clock_i,
+                reset_i       => reset_i,
+                read_i        => io_read_i,
+                write_i       => io_write_i,
+                mask_i        => io_mask_i,
+                addr_i        => io_addr_i,
+                data_i        => io_data_i,
+                read_valid_o  => io_read_valid_o,
+                write_valid_o => io_write_valid_o,
+                data_o        => io_data_o,
+                gpio_data_i   => io_gpio_data_i,
+                gpio_data_o   => io_gpio_data_o
+            );
     end generate;
 
     --VGA
-    gen_vga: if (gen_vga_g = 1) generate
+    gen_vga : if (gen_vga_g = 1) generate
         vga_map_1 : entity work.vga_map
             port map (
                 clock_i       => clock_i,

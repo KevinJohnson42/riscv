@@ -28,18 +28,17 @@ end entity;
 
 architecture rtl of uart_map is
 
-    signal read_valid  : std_logic := '0';
-    signal write_valid : std_logic := '0';
-
-    signal write_enable : std_logic := '0';
-    signal read_enable  : std_logic := '0';
-    signal write_ready  : std_logic := '0';
-    signal read_ready   : std_logic := '0';
-    signal fifo_dout    : std_logic_vector(7 downto 0) := (others => '0');
-    signal fifo_din     : std_logic_vector(7 downto 0) := (others => '0');
+    signal read_valid   : std_logic                          := '0';
+    signal write_valid  : std_logic                          := '0';
+    signal write_enable : std_logic                          := '0';
+    signal read_enable  : std_logic                          := '0';
+    signal write_ready  : std_logic                          := '0';
+    signal read_ready   : std_logic                          := '0';
+    signal fifo_dout    : std_logic_vector(7 downto 0)       := (others => '0');
+    signal fifo_din     : std_logic_vector(7 downto 0)       := (others => '0');
     signal write_count  : std_logic_vector(depth_g downto 0) := (others => '0');
     signal read_count   : std_logic_vector(depth_g downto 0) := (others => '0');
-    signal address      : unsigned(3 downto 0) := (others => '0');
+    signal address      : unsigned(3 downto 0)               := (others => '0');
 
 begin
     read_valid_o  <= read_valid;
@@ -66,15 +65,15 @@ begin
                 read_valid  <= read_i;
                 data_o      <= x"0000000" & "000" & write_ready;
             elsif (address = 4) then
-                write_valid <= write_i;
-                read_valid  <= read_i;
+                write_valid                 <= write_i;
+                read_valid                  <= read_i;
                 data_o(31 downto depth_g+1) <= (others => '0');
-                data_o(depth_g downto 0) <= read_count;
+                data_o(depth_g downto 0)    <= read_count;
             elsif (address = 8) then
-                write_valid <= write_i;
-                read_valid  <= read_i;
+                write_valid                 <= write_i;
+                read_valid                  <= read_i;
                 data_o(31 downto depth_g+1) <= (others => '0');
-                data_o(depth_g downto 0) <= write_count;
+                data_o(depth_g downto 0)    <= write_count;
             end if;
         end if;
     end process;
