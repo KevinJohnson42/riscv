@@ -6,11 +6,16 @@ use work.inst_pack.all;
 entity soc is
     generic
     (
-        uart_cycles_g : positive := 10
+        uart_cycles_g   : positive := 10;
+        gen_timer_g     : natural range 0 to 1 := 0;
+        gen_uart_g      : natural range 0 to 1 := 0;
+        gen_gpio_g      : natural range 0 to 1 := 0;
+        gen_vga_g       : natural range 0 to 1 := 0
     );
     port
     (
         clock_i   : in  std_logic;
+        reset_i   : in  std_logic;
         uart_rx_i : in  std_logic;
         uart_tx_o : out std_logic;
         gpio_i    : in  std_logic_vector(31 downto 0);
@@ -25,8 +30,7 @@ end entity;
 
 architecture rtl of soc is
 
-    signal reset_i : std_logic := '0';
-
+    --Core signals
     signal core_mem_read_valid_i  : std_logic;
     signal core_mem_write_valid_i : std_logic;
     signal core_mem_addr_i        : std_logic_vector(31 downto 0);
@@ -37,6 +41,7 @@ architecture rtl of soc is
     signal core_mem_addr_o        : std_logic_vector(31 downto 0);
     signal core_mem_data_o        : std_logic_vector(31 downto 0);
 
+    --Memory Controller signals
     signal mc_host_read_i        : std_logic;
     signal mc_host_write_i       : std_logic;
     signal mc_host_mask_i        : std_logic_vector(3 downto 0);
@@ -111,7 +116,7 @@ architecture rtl of soc is
     signal mc_dev7_write_valid_i : std_logic;
     signal mc_dev7_data_i        : std_logic_vector(31 downto 0);
 
-
+    --Instruction RAM signals
     signal inst_read_i        : std_logic;
     signal inst_write_i       : std_logic;
     signal inst_mask_i        : std_logic_vector(3 downto 0);
@@ -121,6 +126,7 @@ architecture rtl of soc is
     signal inst_write_valid_o : std_logic;
     signal inst_data_o        : std_logic_vector(31 downto 0);
 
+    --Stack RAM signals
     signal stack_read_i        : std_logic;
     signal stack_write_i       : std_logic;
     signal stack_mask_i        : std_logic_vector(3 downto 0);
@@ -130,6 +136,7 @@ architecture rtl of soc is
     signal stack_write_valid_o : std_logic;
     signal stack_data_o        : std_logic_vector(31 downto 0);
 
+    --Timer signals
     signal timer_read_i        : std_logic;
     signal timer_write_i       : std_logic;
     signal timer_mask_i        : std_logic_vector(3 downto 0);
@@ -139,6 +146,7 @@ architecture rtl of soc is
     signal timer_write_valid_o : std_logic;
     signal timer_data_o        : std_logic_vector(31 downto 0);
 
+    --Uart signals
     signal uart_read_i        : std_logic;
     signal uart_write_i       : std_logic;
     signal uart_mask_i        : std_logic_vector(3 downto 0);
@@ -148,6 +156,7 @@ architecture rtl of soc is
     signal uart_write_valid_o : std_logic;
     signal uart_data_o        : std_logic_vector(31 downto 0);
 
+    --GPIO signals
     signal io_read_i        : std_logic;
     signal io_write_i       : std_logic;
     signal io_mask_i        : std_logic_vector(3 downto 0);
@@ -159,6 +168,7 @@ architecture rtl of soc is
     signal io_gpio_data_i   : std_logic_vector(31 downto 0);
     signal io_gpio_data_o   : std_logic_vector(31 downto 0);
 
+    --VGA signals
     signal vga_read_i        : std_logic;
     signal vga_write_i       : std_logic;
     signal vga_mask_i        : std_logic_vector(3 downto 0);
@@ -286,7 +296,7 @@ begin
         );
     inst_ram : entity work.ram
         generic map (
-            ram_depth_g  => memory_depth,
+            ram_depth_g  => memory_depth, --defined in inst_pack.vhd
             ram_byte_0_g => memory_byte_0,
             ram_byte_1_g => memory_byte_1,
             ram_byte_2_g => memory_byte_2,
@@ -324,6 +334,9 @@ begin
             write_valid_o => stack_write_valid_o,
             data_o        => stack_data_o
         );
+
+    --TIMER
+    gen_timer: if (gen_uart_g = 1) generate
     timer_map_1 : entity work.timer_map
         port map (
             clock_i       => clock_i,
@@ -337,6 +350,10 @@ begin
             write_valid_o => timer_write_valid_o,
             data_o        => timer_data_o
         );
+    end generate;
+
+    --UART
+    gen_uart: if (gen_uart_g = 1) generate
     uart_map_1 : entity work.uart_map
         generic map (
             cycles_g => uart_cycles_g,
@@ -356,6 +373,10 @@ begin
             rx_i          => uart_rx_i,
             tx_o          => uart_tx_o
         );
+    end generate;
+
+    --GPIO
+    gen_gpio: if (gen_gpio_g = 1) generate
     io_map_1 : entity work.io_map
         port map (
             clock_i       => clock_i,
@@ -371,24 +392,29 @@ begin
             gpio_data_i   => io_gpio_data_i,
             gpio_data_o   => io_gpio_data_o
         );
-    vga_map_1 : entity work.vga_map
-        port map (
-            clock_i       => clock_i,
-            reset_i       => reset_i,
-            read_i        => vga_read_i,
-            write_i       => vga_write_i,
-            mask_i        => vga_mask_i,
-            addr_i        => vga_addr_i,
-            data_i        => vga_data_i,
-            read_valid_o  => vga_read_valid_o,
-            write_valid_o => vga_write_valid_o,
-            data_o        => vga_data_o,
-            vga_r_o       => vga_r_o,
-            vga_g_o       => vga_g_o,
-            vga_b_o       => vga_b_o,
-            vga_hs_o      => vga_hs_o,
-            vga_vs_o      => vga_vs_o
-        );
+    end generate;
+
+    --VGA
+    gen_vga: if (gen_vga_g = 1) generate
+        vga_map_1 : entity work.vga_map
+            port map (
+                clock_i       => clock_i,
+                reset_i       => reset_i,
+                read_i        => vga_read_i,
+                write_i       => vga_write_i,
+                mask_i        => vga_mask_i,
+                addr_i        => vga_addr_i,
+                data_i        => vga_data_i,
+                read_valid_o  => vga_read_valid_o,
+                write_valid_o => vga_write_valid_o,
+                data_o        => vga_data_o,
+                vga_r_o       => vga_r_o,
+                vga_g_o       => vga_g_o,
+                vga_b_o       => vga_b_o,
+                vga_hs_o      => vga_hs_o,
+                vga_vs_o      => vga_vs_o
+            );
+    end generate;
 
 
     --Core inputs

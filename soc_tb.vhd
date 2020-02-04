@@ -8,6 +8,7 @@ end entity soc_tb;
 architecture testbench of soc_tb is
 
     signal clock_i   : std_logic := '0';
+    signal reset_i   : std_logic := '0';
     signal uart_rx_i : std_logic := '1';
     signal uart_tx_o : std_logic := '0';
     signal gpio_i    : std_logic_vector(31 downto 0) := (others => '0');
@@ -25,14 +26,28 @@ begin
         clock_i <= not clock_i;
     end process;
 
+    reset_i_ps : process
+    begin
+        reset_i <= '1';
+        wait until clock_i = '1';
+        reset_i <= '0';
+        wait;
+    end process;
+
+
     DUT : entity work.soc
         generic map
         (
-            uart_cycles_g => 10
+            uart_cycles_g => 10,
+            gen_timer_g   => 1,
+            gen_uart_g    => 1,
+            gen_gpio_g    => 1,
+            gen_vga_g     => 0 --Faster sim = 0
         )
         port map
         (
             clock_i   => clock_i,
+            reset_i   => reset_i,
             uart_rx_i => uart_rx_i,
             uart_tx_o => uart_tx_o,
             gpio_i    => gpio_i,
