@@ -7,14 +7,16 @@ char*header =
     "use ieee.std_logic_1164.all;\n"
     "use ieee.numeric_std.all;\n"
     "use ieee.math_real.all;\n\n"
-    "package inst_pack is\n"
-    "    constant memory_depth : positive  := 10;\n"
-    "    type data_array is array (2**memory_depth-1 downto 0) of std_logic_vector(7 downto 0);\n";
+    "package inst_pack is\n";
 
-char*byte0  = "    constant memory_byte_0 : data_array :=\n    (\n";
-char*byte1  = "    constant memory_byte_1 : data_array :=\n    (\n";
-char*byte2  = "    constant memory_byte_2 : data_array :=\n    (\n";
-char*byte3  = "    constant memory_byte_3 : data_array :=\n    (\n";
+char*memory_depth="\tconstant memory_depth : positive  := %d;\n";
+
+char*data_array="\ttype data_array is array (2**memory_depth-1 downto 0) of std_logic_vector(7 downto 0);\n";
+
+char*byte0  = "\tconstant memory_byte_0 : data_array :=\n\t(\n";
+char*byte1  = "\tconstant memory_byte_1 : data_array :=\n\t(\n";
+char*byte2  = "\tconstant memory_byte_2 : data_array :=\n\t(\n";
+char*byte3  = "\tconstant memory_byte_3 : data_array :=\n\t(\n";
 char*footer ="end inst_pack;\n";
 
 typedef unsigned char u8;
@@ -26,32 +28,37 @@ void write_data_array(FILE*fp, char*name, u8*data, int mod, int n)
     fprintf(fp,"%s",name);
     for(int i=0;i<=n-width;i+=width)
     {
-        fprintf(fp,"        ");
+        fprintf(fp,"\t\t");
         for(int j=0;j<width;j++)
         {
             if((i+j)%4 == mod)
             {
-                fprintf(fp,"%3d=>x\"%02X\",",count,data[i+j]);
+                fprintf(fp,"%4d=>x\"%02X\",",count,data[i+j]);
                 count++;
             }
         }
         fprintf(fp,"\n");
     }
-    fprintf(fp,"        ");
+    fprintf(fp,"\t\t");
     for(int i=width*(n/width);i<n;i++)
     {
         if(i%4 == mod)
         {
-            fprintf(fp,"%3d=>x\"%02X\",",count,data[i]);
+            fprintf(fp,"%4d=>x\"%02X\",",count,data[i]);
             count++;
         }
     }
-    fprintf(fp,"\n         ");
-    fprintf(fp,"others => (others => '0')\n    );\n");
+    fprintf(fp,"\n\t\t");
+    fprintf(fp,"others => (others => '0')\n\t);\n");
 }
 
 int main(int argc, char**argv)
 {
+    //Size = 2^n (32bit instructions)
+    //So size=10 -> 2^10 -> 1024 * 4 bytes -> 4096 bytes or 32,768 bits
+    //1 BRAM = 36,000 bits
+    int memory_size = 10;
+
     //Check args
     if(argc != 2){printf("Usage: ./vhdl.out filename.bin"); exit(1);}
     
@@ -73,6 +80,8 @@ int main(int argc, char**argv)
     //Create the inst_pack.vhd file
     fp = fopen("inst_pack.vhd","w");
     fprintf(fp,"%s",header);
+    fprintf(fp,memory_depth,memory_size);
+    fprintf(fp,"%s",data_array);
     write_data_array(fp,byte0,data,0,n);
     write_data_array(fp,byte1,data,1,n);
     write_data_array(fp,byte2,data,2,n);
