@@ -104,7 +104,7 @@ begin
     	case offset is
     		when "00" => dout <= ram_3_dout & ram_2_dout & ram_1_dout & ram_0_dout;
     		when "01" => dout <= ram_0_dout & ram_3_dout & ram_2_dout & ram_1_dout;
-    		when "10" => dout <= ram_1_dout & ram_2_dout & ram_3_dout & ram_0_dout;
+    		when "10" => dout <= ram_1_dout & ram_0_dout & ram_3_dout & ram_2_dout;
     		when "11" => dout <= ram_0_dout & ram_1_dout & ram_2_dout & ram_3_dout;
     		when others => dout <= ram_3_dout & ram_2_dout & ram_1_dout & ram_0_dout; --Never
     	end case;
