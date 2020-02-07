@@ -60,7 +60,7 @@ begin
 
 
     offset  <= unsigned(addr_i(1 downto 0));
-    address <= to_integer(unsigned(addr_i(depth_c-1 downto 2)));
+    address <= to_integer(unsigned(addr_i(depth_c+2-1 downto 2)));
 
     write_ram_0_ps : process(clock_i)
     begin
