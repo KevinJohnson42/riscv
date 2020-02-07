@@ -35,15 +35,25 @@ architecture rtl of ram is
     signal ram_1       : data_array                    := ram_byte_1_g;
     signal ram_2       : data_array                    := ram_byte_2_g;
     signal ram_3       : data_array                    := ram_byte_3_g;
-    signal addr        : std_logic_vector(31 downto 0) := (others => '0');
     signal read_valid  : std_logic                     := '0';
     signal write_valid : std_logic                     := '0';
-    signal valid       : std_logic                     := '0';
     signal dout        : std_logic_vector(31 downto 0) := (others => '0');
     signal byte_0      : std_logic_vector(7 downto 0)  := (others => '0');
     signal byte_1      : std_logic_vector(7 downto 0)  := (others => '0');
     signal byte_2      : std_logic_vector(7 downto 0)  := (others => '0');
     signal byte_3      : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_0_din   : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_1_din   : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_2_din   : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_3_din   : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_0_dout  : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_1_dout  : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_2_dout  : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_3_dout  : std_logic_vector(7 downto 0)  := (others => '0');
+    signal ram_0_write : std_logic 					   := '0';
+    signal ram_1_write : std_logic 					   := '0';
+    signal ram_2_write : std_logic 					   := '0';
+    signal ram_3_write : std_logic 					   := '0';
     signal offset      : unsigned(1 downto 0)          := (others => '0');
     signal address     : natural                       := 0;
 
@@ -58,6 +68,48 @@ begin
     byte_2 <= data_i(23 downto 16);
     byte_3 <= data_i(31 downto 24);
 
+    ram_din_ps : process(all)
+    begin
+    	case offset is
+    		when "00" => 
+    			ram_0_din <= byte_0; ram_0_write <= mask_i(0) and write_i;
+    			ram_1_din <= byte_1; ram_1_write <= mask_i(1) and write_i;
+    			ram_2_din <= byte_2; ram_2_write <= mask_i(2) and write_i;
+    			ram_3_din <= byte_3; ram_3_write <= mask_i(3) and write_i;
+    		when "01" =>
+ 				ram_0_din <= byte_3; ram_0_write <= mask_i(3) and write_i;
+    			ram_1_din <= byte_0; ram_1_write <= mask_i(0) and write_i;
+    			ram_2_din <= byte_1; ram_2_write <= mask_i(1) and write_i;
+    			ram_3_din <= byte_2; ram_3_write <= mask_i(2) and write_i;
+    		when "10" =>
+ 				ram_0_din <= byte_2; ram_0_write <= mask_i(2) and write_i;
+    			ram_1_din <= byte_3; ram_1_write <= mask_i(3) and write_i;
+    			ram_2_din <= byte_0; ram_2_write <= mask_i(0) and write_i;
+    			ram_3_din <= byte_1; ram_3_write <= mask_i(1) and write_i;
+    		when "11" =>
+ 				ram_0_din <= byte_1; ram_0_write <= mask_i(1) and write_i;
+    			ram_1_din <= byte_2; ram_1_write <= mask_i(2) and write_i;
+    			ram_2_din <= byte_3; ram_2_write <= mask_i(3) and write_i;
+    			ram_3_din <= byte_0; ram_3_write <= mask_i(0) and write_i;
+    		when others => --Never
+ 				ram_0_din <= byte_0; ram_0_write <= mask_i(0) and write_i;
+    			ram_1_din <= byte_1; ram_1_write <= mask_i(1) and write_i;
+    			ram_2_din <= byte_2; ram_2_write <= mask_i(2) and write_i;
+    			ram_3_din <= byte_3; ram_3_write <= mask_i(3) and write_i;
+    	end case;
+    end process;
+
+    ram_dout_ps : process(all)
+    begin
+    	case offset is
+    		when "00" => dout <= ram_3_dout & ram_2_dout & ram_1_dout & ram_0_dout;
+    		when "01" => dout <= ram_0_dout & ram_3_dout & ram_2_dout & ram_1_dout;
+    		when "10" => dout <= ram_1_dout & ram_2_dout & ram_3_dout & ram_0_dout;
+    		when "11" => dout <= ram_0_dout & ram_1_dout & ram_2_dout & ram_3_dout;
+    		when others => dout <= ram_3_dout & ram_2_dout & ram_1_dout & ram_0_dout; --Never
+    	end case;
+    end process;
+
 
     offset  <= unsigned(addr_i(1 downto 0));
     address <= to_integer(unsigned(addr_i(depth_c+2-1 downto 2)));
@@ -65,49 +117,66 @@ begin
     write_ram_0_ps : process(clock_i)
     begin
         if rising_edge(clock_i) then
-            if (write_i = '1') then
-                if (offset = 0) and (mask_i(0) = '1') then ram_0(address) <= byte_0;
-                elsif (offset = 1) and (mask_i(3) = '1') then ram_0(address) <= byte_3;
-                elsif (offset = 2) and (mask_i(2) = '1') then ram_0(address) <= byte_2;
-                elsif (offset = 3) and (mask_i(1) = '1') then ram_0(address) <= byte_1;
-                end if;
-            end if;
+        	if (ram_0_write = '1') then
+        		ram_0(address) <= ram_0_din;
+        	end if;
         end if;
     end process;
     write_ram_1_ps : process(clock_i)
     begin
         if rising_edge(clock_i) then
-            if (write_i = '1') then
-                if (offset = 0) and (mask_i(1) = '1') then ram_1(address) <= byte_1;
-                elsif (offset = 1) and (mask_i(0) = '1') then ram_1(address) <= byte_0;
-                elsif (offset = 2) and (mask_i(3) = '1') then ram_1(address) <= byte_3;
-                elsif (offset = 3) and (mask_i(2) = '1') then ram_1(address) <= byte_2;
-                end if;
-            end if;
+        	if (ram_1_write = '1') then
+        		ram_1(address) <= ram_1_din;
+        	end if;
         end if;
     end process;
     write_ram_2_ps : process(clock_i)
     begin
         if rising_edge(clock_i) then
-            if (write_i = '1') then
-                if (offset = 0) and (mask_i(2) = '1') then ram_2(address) <= byte_2;
-                elsif (offset = 1) and (mask_i(1) = '1') then ram_2(address) <= byte_1;
-                elsif (offset = 2) and (mask_i(0) = '1') then ram_2(address) <= byte_0;
-                elsif (offset = 3) and (mask_i(3) = '1') then ram_2(address) <= byte_3;
-                end if;
-            end if;
+        	if (ram_2_write = '1') then
+        		ram_2(address) <= ram_2_din;
+        	end if;
         end if;
     end process;
     write_ram_3_ps : process(clock_i)
     begin
         if rising_edge(clock_i) then
-            if (write_i = '1') then
-                if (offset = 0) and (mask_i(3) = '1') then ram_3(address) <= byte_3;
-                elsif (offset = 1) and (mask_i(2) = '1') then ram_3(address) <= byte_2;
-                elsif (offset = 2) and (mask_i(1) = '1') then ram_3(address) <= byte_1;
-                elsif (offset = 3) and (mask_i(0) = '1') then ram_3(address) <= byte_0;
-                end if;
-            end if;
+        	if (ram_3_write = '1') then
+        		ram_3(address) <= ram_3_din;
+        	end if;
+        end if;
+    end process;
+
+    read_ram_0_ps : process(clock_i)
+    begin
+        if rising_edge(clock_i) then
+        	if (read_i = '1') then
+        		ram_0_dout <= ram_0(address);
+        	end if;
+        end if;
+    end process;
+    read_ram_1_ps : process(clock_i)
+    begin
+        if rising_edge(clock_i) then
+        	if (read_i = '1') then
+        		ram_1_dout <= ram_1(address);
+        	end if;
+        end if;
+    end process;
+    read_ram_2_ps : process(clock_i)
+    begin
+        if rising_edge(clock_i) then
+        	if (read_i = '1') then
+        		ram_2_dout <= ram_2(address);
+        	end if;
+        end if;
+    end process;
+    read_ram_3_ps : process(clock_i)
+    begin
+        if rising_edge(clock_i) then
+        	if (read_i = '1') then
+        		ram_3_dout <= ram_3(address);
+        	end if;
         end if;
     end process;
 
@@ -124,20 +193,4 @@ begin
             write_valid <= write_i;
         end if;
     end process;
-
-    read_ram_ps : process(clock_i)
-    begin
-        if rising_edge(clock_i) then
-            if (read_i = '1') then
-                if (offset = 0) then dout <= ram_3(address) & ram_2(address) & ram_1(address) & ram_0(address);
-                elsif (offset = 1) then dout <= ram_0(address) & ram_3(address) & ram_2(address) & ram_1(address);
-                elsif (offset = 2) then dout <= ram_1(address) & ram_0(address) & ram_3(address) & ram_2(address);
-                elsif (offset = 3) then dout <= ram_2(address) & ram_1(address) & ram_0(address) & ram_3(address);
-                end if;
-            end if;
-        end if;
-    end process;
-
-
-
 end architecture;
